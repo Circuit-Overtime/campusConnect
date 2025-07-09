@@ -43,6 +43,7 @@ export default function ProfilePage() {
                     name: user.displayName || 'New User',
                     email: user.email || '',
                     avatar: user.photoURL || `https://placehold.co/128x128.png?text=${user.displayName?.charAt(0) || 'U'}`,
+                    username: user.email?.split('@')[0] || `user${user.uid.substring(0,5)}`,
                     major: '',
                     year: 1,
                     bio: ''
@@ -65,6 +66,7 @@ export default function ProfilePage() {
             await update(userRef, {
                 name: profile.name,
                 email: profile.email,
+                username: profile.username,
                 major: profile.major,
                 year: Number(profile.year), // ensure year is a number
                 bio: profile.bio
@@ -142,6 +144,7 @@ export default function ProfilePage() {
                         </Avatar>
                         <div>
                             <CardTitle className="text-3xl">{profile.name}</CardTitle>
+                            <CardDescription>@{profile.username}</CardDescription>
                             <div className="text-muted-foreground mt-2 space-y-1">
                                 <div className="flex items-center gap-2 justify-center sm:justify-start"><Mail className="h-4 w-4" />{profile.email}</div>
                                 <div className="flex items-center gap-2 justify-center sm:justify-start"><GraduationCap className="h-4 w-4" />{profile.major || 'Not specified'} - Year {profile.year}</div>
@@ -160,8 +163,8 @@ export default function ProfilePage() {
                             <Input id="name" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} />
                         </div>
                          <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" type="email" value={profile.email} onChange={e => setProfile({...profile, email: e.target.value})} />
+                            <Label htmlFor="username">Username</Label>
+                            <Input id="username" value={profile.username || ''} onChange={e => setProfile({...profile, username: e.target.value?.toLowerCase()})} />
                         </div>
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -173,6 +176,10 @@ export default function ProfilePage() {
                             <Label htmlFor="year">Year</Label>
                             <Input id="year" type="number" value={profile.year} onChange={e => setProfile({...profile, year: parseInt(e.target.value) || 1 })} />
                         </div>
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input id="email" type="email" value={profile.email} onChange={e => setProfile({...profile, email: e.target.value})} />
                     </div>
                     
                     <div className="flex justify-end gap-2 pt-4">

@@ -17,13 +17,14 @@ export default function SignupPage() {
     const router = useRouter();
     const { toast } = useToast();
     const [fullName, setFullName] = useState("");
+    const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!fullName || !email || !password) {
+        if (!fullName || !email || !password || !username) {
             toast({ title: "Error", description: "Please fill in all fields.", variant: "destructive" });
             return;
         }
@@ -37,6 +38,7 @@ export default function SignupPage() {
             await set(ref(database, 'users/' + user.uid), {
                 email: user.email,
                 name: fullName,
+                username: username.toLowerCase(),
                 major: '',
                 year: 1,
                 bio: '',
@@ -67,6 +69,10 @@ export default function SignupPage() {
                         <div className="grid gap-2">
                             <Label htmlFor="full-name">Full Name</Label>
                             <Input id="full-name" placeholder="John Doe" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                        </div>
+                         <div className="grid gap-2">
+                            <Label htmlFor="username">Username</Label>
+                            <Input id="username" placeholder="johndoe" required value={username} onChange={(e) => setUsername(e.target.value)} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>

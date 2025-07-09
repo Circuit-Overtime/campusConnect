@@ -61,4 +61,14 @@ export interface User {
   major: string;
   year: number;
   bio: string;
+  username?: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  timestamp: number;
+  authorId: string;
+  authorName: string;
 }
