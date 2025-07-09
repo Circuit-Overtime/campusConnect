@@ -1,3 +1,8 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { database } from "@/lib/firebase";
+import { ref, onValue } from "firebase/database";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, SlidersHorizontal, Calendar as CalendarIcon } from "lucide-react";
@@ -5,17 +10,26 @@ import EventCard from "@/components/event-card";
 import type { Event } from "@/lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-
-const events: Event[] = [
-    { id: "1", title: "GDG Tech Talk: The Future of AI", date: "2024-10-26", time: "3:00 PM", location: "Auditorium A", image: "https://placehold.co/600x400.png", description: "...", tags: ["Tech", "AI"], organizer: "Google Developer Group" },
-    { id: "2", title: "Campus Movie Night: Sci-Fi Special", date: "2024-10-28", time: "7:00 PM", location: "Central Lawn", image: "https://placehold.co/600x400.png", description: "...", tags: ["Social", "Movie"], organizer: "Student Life Committee" },
-    { id: "3", title: "Career Fair 2024", date: "2024-11-02", time: "10:00 AM - 4:00 PM", location: "Grand Hall", image: "https://placehold.co/600x400.png", description: "...", tags: ["Career", "Networking"], organizer: "Career Services" },
-    { id: "4", title: "Art Club Exhibition", date: "2024-11-05", time: "All Day", location: "Fine Arts Gallery", image: "https://placehold.co/600x400.png", description: "...", tags: ["Arts", "Exhibition"], organizer: "Art & Design Club" },
-    { id: "5", title: "Volunteering Day", date: "2024-11-10", time: "9:00 AM", location: "Community Center", image: "https://placehold.co/600x400.png", description: "...", tags: ["Volunteering", "Community"], organizer: "Student Council" },
-    { id: "6", title: "Debate Championship", date: "2024-11-12", time: "6:00 PM", location: "Lecture Hall C", image: "https://placehold.co/600x400.png", description: "...", tags: ["Academic", "Debate"], organizer: "Debate Society" },
-];
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EventsPage() {
+    const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const eventsRef = ref(database, 'events');
+        const unsubscribe = onValue(eventsRef, (snapshot) => {
+            const eventsData = snapshot.val();
+            if (eventsData) {
+                const eventsList = Object.values(eventsData) as Event[];
+                setEvents(eventsList);
+            }
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
     return (
         <div className="space-y-8">
             <div className="text-center">
@@ -45,11 +59,17 @@ export default function EventsPage() {
                 </Button>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {events.map((event) => (
-                    <EventCard key={event.id} event={event} />
-                ))}
-            </div>
+            {loading ? (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-96 w-full" />)}
+                </div>
+            ) : (
+                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {events.map((event) => (
+                        <EventCard key={event.id} event={event} />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

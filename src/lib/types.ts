@@ -9,6 +9,7 @@ export interface Event {
   tags: string[];
   organizer: string;
   capacity?: number;
+  attendees?: Record<string, true>;
 }
 
 export interface Announcement {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { toast } = useToast();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -25,7 +26,8 @@ export default function LoginPage() {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             toast({ title: "Login Successful", description: "Welcome back!" });
-            router.push("/profile");
+            const redirectUrl = searchParams.get('redirect');
+            router.push(redirectUrl || "/profile");
         } catch (error: any) {
             toast({ title: "Login Failed", description: error.message, variant: "destructive" });
         } finally {

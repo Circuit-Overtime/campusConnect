@@ -3,8 +3,8 @@ import type { Event } from "@/lib/types";
 import { BookmarkX } from "lucide-react";
 
 const bookmarkedEvents: Event[] = [
-    { id: "1", title: "GDG Tech Talk: The Future of AI", date: "2024-10-26", time: "3:00 PM", location: "Auditorium A", image: "https://placehold.co/600x400.png", description: "...", tags: ["Tech", "AI"], organizer: "Google Developer Group" },
-    { id: "3", title: "Career Fair 2024", date: "2024-11-02", time: "10:00 AM - 4:00 PM", location: "Grand Hall", image: "https://placehold.co/600x400.png", description: "...", tags: ["Career", "Networking"], organizer: "Career Services" },
+    { id: "1", title: "GDG Tech Talk: The Future of AI", date: "2024-10-26", time: "3:00 PM", location: "Auditorium A", image: "https://placehold.co/600x400.png", description: "...", tags: ["Tech", "AI"], organizer: "Google Developer Group", attendees: {} },
+    { id: "3", title: "Career Fair 2024", date: "2024-11-02", time: "10:00 AM - 4:00 PM", location: "Grand Hall", image: "https://placehold.co/600x400.png", description: "...", tags: ["Career", "Networking"], organizer: "Career Services", attendees: {} },
 ];
 
 export default function BookmarksPage() {

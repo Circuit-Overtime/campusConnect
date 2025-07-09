@@ -1,43 +1,14 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { database } from "@/lib/firebase";
+import { ref, onValue, query, limitToFirst, get, set } from "firebase/database";
 import EventCard from "@/components/event-card";
 import AnnouncementCard from "@/components/announcement-card";
 import type { Event, Announcement } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-
-const events: Event[] = [
-  {
-    id: "1",
-    title: "GDG Tech Talk: The Future of AI",
-    date: "2024-10-26",
-    time: "3:00 PM",
-    location: "Auditorium A",
-    image: "https://placehold.co/600x400.png",
-    description: "Join us for an exciting talk on the future of Artificial Intelligence with industry experts.",
-    tags: ["Tech", "AI"],
-    organizer: "Google Developer Group",
-  },
-  {
-    id: "2",
-    title: "Campus Movie Night: Sci-Fi Special",
-    date: "2024-10-28",
-    time: "7:00 PM",
-    location: "Central Lawn",
-    image: "https://placehold.co/600x400.png",
-    description: "Grab your blankets and enjoy a classic sci-fi movie under the stars.",
-    tags: ["Social", "Movie"],
-    organizer: "Student Life Committee",
-  },
-  {
-    id: "3",
-    title: "Career Fair 2024",
-    date: "2024-11-02",
-    time: "10:00 AM - 4:00 PM",
-    location: "Grand Hall",
-    image: "https://placehold.co/600x400.png",
-    description: "Connect with top companies and explore internship and job opportunities.",
-    tags: ["Career", "Networking"],
-    organizer: "Career Services",
-  },
-];
+import { Skeleton } from "@/components/ui/skeleton";
 
 const announcements: Announcement[] = [
   {
@@ -56,7 +27,54 @@ const announcements: Announcement[] = [
   },
 ];
 
+const dummyEvents: Event[] = [
+    { id: "1", title: "GDG Tech Talk: The Future of AI", date: "2024-10-26", time: "3:00 PM", location: "Auditorium A", image: "https://placehold.co/600x400.png", description: "Join us for an exciting talk on the future of Artificial Intelligence with industry experts.", tags: ["Tech", "AI"], organizer: "Google Developer Group", capacity: 200, attendees: {} },
+    { id: "2", title: "Campus Movie Night: Sci-Fi Special", date: "2024-10-28", time: "7:00 PM", location: "Central Lawn", image: "https://placehold.co/600x400.png", description: "Grab your blankets and enjoy a classic sci-fi movie under the stars.", tags: ["Social", "Movie"], organizer: "Student Life Committee", capacity: 500, attendees: {} },
+    { id: "3", title: "Career Fair 2024", date: "2024-11-02", time: "10:00 AM - 4:00 PM", location: "Grand Hall", image: "https://placehold.co/600x400.png", description: "Connect with top companies and explore internship and job opportunities.", tags: ["Career", "Networking"], organizer: "Career Services", attendees: {} },
+    { id: "4", title: "Art Club Exhibition", date: "2024-11-05", time: "All Day", location: "Fine Arts Gallery", image: "https://placehold.co/600x400.png", description: "...", tags: ["Arts", "Exhibition"], organizer: "Art & Design Club", attendees: {} },
+    { id: "5", title: "Volunteering Day", date: "2024-11-10", time: "9:00 AM", location: "Community Center", image: "https://placehold.co/600x400.png", description: "...", tags: ["Volunteering", "Community"], organizer: "Student Council", attendees: {} },
+    { id: "6", title: "Debate Championship", date: "2024-11-12", time: "6:00 PM", location: "Lecture Hall C", image: "https://placehold.co/600x400.png", description: "...", tags: ["Academic", "Debate"], organizer: "Debate Society", attendees: {} },
+];
+
 export default function Home() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const eventsRef = ref(database, 'events');
+
+    const seedDataIfNeeded = async () => {
+        const snapshot = await get(eventsRef);
+        if (!snapshot.exists()) {
+            console.log("No event data found. Seeding database...");
+            const updates: Record<string, any> = {};
+            dummyEvents.forEach(event => {
+                const { id, ...eventData } = event;
+                updates[`/events/${id}`] = eventData;
+            });
+            await set(ref(database), updates);
+        }
+    };
+
+    seedDataIfNeeded().then(() => {
+        const eventsQuery = query(eventsRef, limitToFirst(3));
+        const unsubscribe = onValue(eventsQuery, (snapshot) => {
+            const eventsData = snapshot.val();
+            if (eventsData) {
+                const eventsList = Object.entries(eventsData).map(([id, data]) => ({
+                    id,
+                    ...(data as Omit<Event, 'id'>)
+                }));
+                setEvents(eventsList);
+            }
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    });
+
+  }, []);
+
   return (
     <div className="space-y-12">
       <section className="text-center bg-card p-8 rounded-xl shadow-md">
@@ -67,13 +85,21 @@ export default function Home() {
       <section>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold">Upcoming Events</h2>
-          <Button variant="link">View All</Button>
+          <Button variant="link" asChild>
+            <Link href="/events">View All</Link>
+          </Button>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </div>
+        {loading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-[28rem] w-full" />)}
+            </div>
+        ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {events.map((event) => (
+                <EventCard key={event.id} event={event} />
+            ))}
+            </div>
+        )}
       </section>
 
       <section>
