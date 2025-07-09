@@ -42,6 +42,7 @@ const navItems = [
   { label: "Home", href: "/", icon: Home },
   { label: "Clubs", href: "/clubs", icon: Users },
   { label: "Events", href: "/events", icon: CalendarDays },
+  { label: "Blogs", href: "/blogs", icon: Newspaper },
   { label: "Resources", href: "/resources", icon: FolderKanban },
   { label: "Chat", href: "/chat", icon: MessageSquare },
   { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
