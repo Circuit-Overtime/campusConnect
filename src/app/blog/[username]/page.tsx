@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { database } from "@/lib/firebase";
-import { ref, query, orderByChild, equalTo, get, onValue } from "firebase/database";
+import { ref, query, orderByChild, equalTo, get, onValue, type Unsubscribe } from "firebase/database";
 import type { User, BlogPost } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,9 +24,15 @@ export default function UserBlogPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!username) return;
+        if (!username) {
+            setError("No username provided in the URL.");
+            setLoading(false);
+            return;
+        }
 
-        const findUser = async () => {
+        let unsubscribe: Unsubscribe | null = null;
+
+        const findUserAndPosts = async () => {
             try {
                 const usersRef = ref(database, 'users');
                 const userQuery = query(usersRef, orderByChild('username'), equalTo(username));
@@ -39,9 +45,8 @@ export default function UserBlogPage() {
                     const userProfile: User = { id: userId, ...userData };
                     setAuthor(userProfile);
 
-                    // Now fetch posts for this user
                     const postsRef = ref(database, `blogs/${userId}`);
-                    onValue(postsRef, (postSnapshot) => {
+                    unsubscribe = onValue(postsRef, (postSnapshot) => {
                         const postsData = postSnapshot.val();
                         if (postsData) {
                             const postsList = Object.entries(postsData).map(([id, post]) => ({
@@ -53,6 +58,9 @@ export default function UserBlogPage() {
                             setPosts([]);
                         }
                         setLoading(false);
+                    }, (err) => {
+                        setError("Could not load blog posts. They may not be public.");
+                        setLoading(false);
                     });
 
                 } else {
@@ -60,12 +68,18 @@ export default function UserBlogPage() {
                     setLoading(false);
                 }
             } catch (err: any) {
-                setError("Failed to load blog.");
+                setError("Failed to load blog. The user's profile or blog may not be public.");
                 setLoading(false);
             }
         };
 
-        findUser();
+        findUserAndPosts();
+
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
     }, [username]);
 
     if (loading) {
