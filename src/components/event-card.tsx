@@ -81,7 +81,7 @@ export default function EventCard({ event }: EventCardProps) {
       </CardHeader>
       <CardContent className="p-4 flex-grow">
         <div className="flex flex-wrap gap-2 mb-2">
-          {event.tags.map((tag) => (
+          {event.tags && event.tags.map((tag) => (
             <Badge key={tag} variant="secondary">{tag}</Badge>
           ))}
         </div>

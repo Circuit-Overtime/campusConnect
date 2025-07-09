@@ -148,7 +148,7 @@ export default function EventDetailPage() {
         </CardHeader>
         <CardContent className="p-6 md:p-8">
           <div className="flex flex-wrap gap-2 mb-4">
-            {event.tags.map((tag) => (
+            {event.tags && event.tags.map((tag) => (
               <Badge key={tag}>{tag}</Badge>
             ))}
           </div>
