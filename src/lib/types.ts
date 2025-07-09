@@ -52,3 +52,13 @@ export interface ChatMessage {
   text: string;
   timestamp: string;
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  major: string;
+  year: number;
+  bio: string;
+}

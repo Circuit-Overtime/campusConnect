@@ -12,6 +12,7 @@ import {
   Menu,
   Search,
   UserCircle,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ const navItems = [
   { label: "Resources", href: "/resources", icon: FolderKanban },
   { label: "Chat", href: "/chat", icon: MessageSquare },
   { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
+  { label: "Issues", href: "/issues", icon: AlertCircle },
 ];
 
 export default function Header() {
@@ -103,10 +105,14 @@ export default function Header() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/profile">Profile</Link>
+              </DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                 <Link href="/login">Logout</Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="md:hidden">
