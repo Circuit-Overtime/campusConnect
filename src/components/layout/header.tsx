@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -14,7 +15,9 @@ import {
   Search,
   AlertCircle,
   LogOut,
-  Newspaper
+  Newspaper,
+  CalendarPlus,
+  PenSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -134,7 +137,19 @@ export default function Header() {
                         My Blog
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>Settings</DropdownMenuItem>
+                     <DropdownMenuSeparator />
+                     <DropdownMenuItem asChild>
+                      <Link href="/events/create">
+                        <CalendarPlus className="mr-2 h-4 w-4" />
+                        Create Event
+                      </Link>
+                    </DropdownMenuItem>
+                     <DropdownMenuItem asChild>
+                      <Link href="/profile/blog">
+                        <PenSquare className="mr-2 h-4 w-4" />
+                        Create Post
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />

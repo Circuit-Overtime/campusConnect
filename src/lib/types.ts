@@ -1,3 +1,4 @@
+
 export interface Event {
   id: string;
   title: string;
@@ -8,6 +9,7 @@ export interface Event {
   image: string;
   tags: string[];
   organizer: string;
+  organizerId?: string;
   capacity?: number;
   attendees?: Record<string, true>;
 }

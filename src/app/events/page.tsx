@@ -1,11 +1,14 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { database } from "@/lib/firebase";
 import { ref, onValue } from "firebase/database";
+import { useAuth } from "@/components/providers/auth-provider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, SlidersHorizontal, Calendar as CalendarIcon } from "lucide-react";
+import { Search, SlidersHorizontal, Calendar as CalendarIcon, Plus } from "lucide-react";
 import EventCard from "@/components/event-card";
 import type { Event } from "@/lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -13,6 +16,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EventsPage() {
+    const { user } = useAuth();
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -21,7 +25,9 @@ export default function EventsPage() {
         const unsubscribe = onValue(eventsRef, (snapshot) => {
             const eventsData = snapshot.val();
             if (eventsData) {
-                const eventsList = Object.values(eventsData) as Event[];
+                const eventsList = Object.entries(eventsData)
+                    .map(([id, event]) => ({ id, ...(event as Omit<Event, 'id'>) }))
+                    .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
                 setEvents(eventsList);
             }
             setLoading(false);
@@ -32,9 +38,19 @@ export default function EventsPage() {
 
     return (
         <div className="space-y-8">
-            <div className="text-center">
-                <h1 className="text-4xl font-bold tracking-tight">Campus Events</h1>
-                <p className="mt-2 text-lg text-muted-foreground">Discover what's happening on campus. Never miss out.</p>
+            <div className="flex justify-between items-center text-center">
+                <div>
+                    <h1 className="text-4xl font-bold tracking-tight">Campus Events</h1>
+                    <p className="mt-2 text-lg text-muted-foreground">Discover what's happening on campus. Never miss out.</p>
+                </div>
+                {user && (
+                    <Button asChild>
+                        <Link href="/events/create">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create Event
+                        </Link>
+                    </Button>
+                )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">

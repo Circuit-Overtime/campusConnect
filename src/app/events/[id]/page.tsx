@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,9 +14,10 @@ import type { Event, User } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Clock, MapPin, Share2, Plus, UserX } from "lucide-react";
+import { Calendar, Clock, MapPin, Share2, Plus, UserX, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 type Attendee = Pick<User, 'id' | 'name' | 'avatar'>;
 
@@ -32,6 +34,7 @@ export default function EventDetailPage() {
     const [loading, setLoading] = useState(true);
 
     const isRegistered = user && event?.attendees && event.attendees[user.uid];
+    const isOwner = user && event?.organizerId === user.uid;
 
     useEffect(() => {
         if (!eventId) return;
@@ -94,6 +97,19 @@ export default function EventDetailPage() {
         }
     };
 
+    const handleDelete = async () => {
+        if (!isOwner || !event) return;
+
+        try {
+            await remove(ref(database, `events/${event.id}`));
+            toast({ title: "Event Deleted", description: "The event has been successfully removed." });
+            router.push("/events");
+        } catch (error: any) {
+            toast({ title: "Error", description: `Failed to delete event: ${error.message}`, variant: "destructive" });
+        }
+    };
+
+
     if (loading) {
         return (
             <div className="max-w-4xl mx-auto">
@@ -149,10 +165,29 @@ export default function EventDetailPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="flex-1" onClick={handleRegister} variant={isRegistered ? "secondary" : "default"}>
-                {isRegistered ? <><UserX className="mr-2 h-5 w-5"/> Un-RSVP</> : <><Plus className="mr-2 h-5 w-5"/>Register Now</>}
+            <Button size="lg" className="flex-1" onClick={handleRegister} variant={isRegistered ? "secondary" : "default"} disabled={isOwner}>
+                {isOwner ? <><Plus className="mr-2 h-5 w-5"/> You are the organizer</> : isRegistered ? <><UserX className="mr-2 h-5 w-5"/> Un-RSVP</> : <><Plus className="mr-2 h-5 w-5"/>Register Now</>}
             </Button>
             <Button size="lg" variant="outline" className="flex-1"><Share2 className="mr-2 h-5 w-5"/>Share Event</Button>
+            {isOwner && (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button size="lg" variant="destructive" className="flex-1"><Trash2 className="mr-2 h-5 w-5"/>Delete Event</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete your event and all of its data.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
           </div>
 
           <hr className="my-8" />
