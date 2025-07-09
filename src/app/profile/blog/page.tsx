@@ -79,7 +79,7 @@ export default function BlogManagementPage() {
             toast({ title: "Success!", description: "Your new post has been published." });
             setTitle("");
             setContent("");
-        } catch (error: any) => {
+        } catch (error: any) {
             toast({ title: "Failed to post", description: error.message, variant: "destructive" });
         } finally {
             setIsSaving(false);
