@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, Download, FileText, Video, Presentation } fr
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import type { Resource } from "@/lib/types";
+import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
