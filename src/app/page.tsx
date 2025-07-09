@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { database } from "@/lib/firebase";
-import { ref, onValue, query, limitToFirst, get, set } from "firebase/database";
+import { ref, onValue, query, limitToFirst, get, update } from "firebase/database";
 import EventCard from "@/components/event-card";
 import AnnouncementCard from "@/components/announcement-card";
 import type { Event, Announcement } from "@/lib/types";
@@ -52,12 +53,12 @@ export default function Home() {
                 const { id, ...eventData } = event;
                 updates[`/events/${id}`] = eventData;
             });
-            await set(ref(database), updates);
+            await update(ref(database), updates);
         }
     };
 
     seedDataIfNeeded().then(() => {
-        const eventsQuery = query(eventsRef, limitToFirst(3));
+        const eventsQuery = query(ref(database, 'events'), query(onValue.toString()), limitToFirst(3));
         const unsubscribe = onValue(eventsQuery, (snapshot) => {
             const eventsData = snapshot.val();
             if (eventsData) {
