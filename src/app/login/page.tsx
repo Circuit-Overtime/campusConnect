@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Briefcase } from "lucide-react";
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,6 +18,26 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [isGoogleLoading, setIsGoogleLoading] = useState(true);
+
+    useEffect(() => {
+        const handleRedirect = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result) {
+                    toast({ title: "Login Successful", description: "Welcome!" });
+                    router.push("/profile");
+                } else {
+                    setIsGoogleLoading(false);
+                }
+            } catch (error: any) {
+                toast({ title: "Google Login Failed", description: error.message, variant: "destructive" });
+                setIsGoogleLoading(false);
+            }
+        };
+        handleRedirect();
+    }, [router, toast]);
+
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,17 +54,9 @@ export default function LoginPage() {
     };
 
     const handleGoogleLogin = async () => {
-        setLoading(true);
+        setIsGoogleLoading(true);
         const provider = new GoogleAuthProvider();
-        try {
-            await signInWithPopup(auth, provider);
-            toast({ title: "Login Successful", description: "Welcome!" });
-            router.push("/profile");
-        } catch (error: any) {
-            toast({ title: "Google Login Failed", description: error.message, variant: "destructive" });
-        } finally {
-            setLoading(false);
-        }
+        await signInWithRedirect(auth, provider);
     }
 
     return (
@@ -59,7 +71,7 @@ export default function LoginPage() {
                     <form onSubmit={handleLogin} className="grid gap-4">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} disabled={isGoogleLoading}/>
                         </div>
                         <div className="grid gap-2">
                             <div className="flex items-center">
@@ -68,14 +80,14 @@ export default function LoginPage() {
                                     Forgot your password?
                                 </Link>
                             </div>
-                            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={isGoogleLoading}/>
                         </div>
-                        <Button type="submit" className="w-full" disabled={loading}>
+                        <Button type="submit" className="w-full" disabled={loading || isGoogleLoading}>
                             {loading ? "Logging in..." : "Login"}
                         </Button>
                     </form>
-                    <Button variant="outline" className="w-full mt-4" onClick={handleGoogleLogin} disabled={loading}>
-                        Login with Google
+                    <Button variant="outline" className="w-full mt-4" onClick={handleGoogleLogin} disabled={loading || isGoogleLoading}>
+                        {isGoogleLoading ? "Checking login status..." : "Login with Google"}
                     </Button>
                     <div className="mt-4 text-center text-sm">
                         Don&apos;t have an account?{" "}
