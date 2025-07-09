@@ -2,17 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Briefcase } from "lucide-react";
-import { signInWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from "firebase/auth";
-import { auth, database } from "@/lib/firebase";
-import { ref, set, get } from "firebase/database";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
-import type { User } from "@/lib/types";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -20,44 +18,6 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emailPassLoading, setEmailPassLoading] = useState(false);
-    const [googleLoading, setGoogleLoading] = useState(false);
-    const [isCheckingRedirect, setIsCheckingRedirect] = useState(true);
-
-    useEffect(() => {
-        const handleRedirectResult = async () => {
-            try {
-                const result = await getRedirectResult(auth);
-                if (result) {
-                    toast({ title: "Login Successful", description: "Welcome!" });
-                    const user = result.user;
-
-                    // Check if user exists in the database, if not, create a profile.
-                    const userRef = ref(database, 'users/' + user.uid);
-                    const snapshot = await get(userRef);
-                    if (!snapshot.exists()) {
-                         const initialProfile: Omit<User, 'id'> = {
-                            name: user.displayName || 'New User',
-                            email: user.email || '',
-                            avatar: user.photoURL || `https://placehold.co/128x128.png?text=${user.displayName?.charAt(0) || 'U'}`,
-                            username: user.email?.split('@')[0] || `user${user.uid.substring(0,5)}`,
-                            major: '',
-                            year: 1,
-                            bio: ''
-                        };
-                        await set(userRef, initialProfile);
-                    }
-                    router.push("/profile");
-                }
-            } catch (error: any) {
-                toast({ title: "Google Login Failed", description: error.message, variant: "destructive" });
-            } finally {
-                setIsCheckingRedirect(false);
-            }
-        };
-
-        handleRedirectResult();
-    }, [router, toast]);
-
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -73,19 +33,7 @@ export default function LoginPage() {
         }
     };
 
-    const handleGoogleLogin = async () => {
-        setGoogleLoading(true);
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-        try {
-            await signInWithRedirect(auth, provider);
-        } catch(error: any) {
-            toast({ title: "Google Login Failed", description: error.message, variant: "destructive" });
-            setGoogleLoading(false);
-        }
-    }
-
-    const isLoading = emailPassLoading || googleLoading || isCheckingRedirect;
+    const isLoading = emailPassLoading;
 
     return (
         <div className="flex items-center justify-center py-12">
@@ -114,9 +62,6 @@ export default function LoginPage() {
                             {emailPassLoading ? "Logging in..." : "Login"}
                         </Button>
                     </form>
-                    <Button variant="outline" className="w-full mt-4" onClick={handleGoogleLogin} disabled={isLoading}>
-                        {isCheckingRedirect ? "Checking login status..." : googleLoading ? "Redirecting..." : "Login with Google"}
-                    </Button>
                     <div className="mt-4 text-center text-sm">
                         Don&apos;t have an account?{" "}
                         <Link href="/signup" className="underline">

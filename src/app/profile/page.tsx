@@ -36,20 +36,6 @@ export default function ProfilePage() {
         const unsubscribe = onValue(userRef, (snapshot) => {
             if (snapshot.exists()) {
                 setProfile({ id: user.uid, ...snapshot.val() });
-            } else {
-                // Initial profile might not exist for Google sign-in users
-                const initialProfile = {
-                    id: user.uid,
-                    name: user.displayName || 'New User',
-                    email: user.email || '',
-                    avatar: user.photoURL || `https://placehold.co/128x128.png?text=${user.displayName?.charAt(0) || 'U'}`,
-                    username: user.email?.split('@')[0] || `user${user.uid.substring(0,5)}`,
-                    major: '',
-                    year: 1,
-                    bio: ''
-                };
-                setProfile(initialProfile);
-                update(userRef, initialProfile);
             }
             setLoading(false);
         });
