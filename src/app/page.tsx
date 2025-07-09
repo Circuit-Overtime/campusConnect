@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { database } from "@/lib/firebase";
-import { ref, onValue, query, limitToFirst, get, update } from "firebase/database";
+import { ref, onValue, query, limitToFirst, get, update, orderByChild, startAt } from "firebase/database";
 import EventCard from "@/components/event-card";
 import AnnouncementCard from "@/components/announcement-card";
 import type { Event, Announcement } from "@/lib/types";
@@ -58,7 +58,8 @@ export default function Home() {
     };
 
     seedDataIfNeeded().then(() => {
-        const eventsQuery = query(ref(database, 'events'), query(onValue.toString()), limitToFirst(3));
+        const today = new Date().toISOString().split('T')[0];
+        const eventsQuery = query(ref(database, 'events'), orderByChild('date'), startAt(today), limitToFirst(3));
         const unsubscribe = onValue(eventsQuery, (snapshot) => {
             const eventsData = snapshot.val();
             if (eventsData) {
@@ -67,6 +68,8 @@ export default function Home() {
                     ...(data as Omit<Event, 'id'>)
                 }));
                 setEvents(eventsList);
+            } else {
+                setEvents([]);
             }
             setLoading(false);
         });
