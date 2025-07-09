@@ -138,7 +138,7 @@ export default function EventDetailPage() {
       <Card className="overflow-hidden">
         <CardHeader className="p-0">
           <Image
-            src={event.image}
+            src={event.image || 'https://placehold.co/600x400.png'}
             alt={event.title}
             width={1200}
             height={400}

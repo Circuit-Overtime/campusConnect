@@ -56,7 +56,7 @@ export default function EventCard({ event }: EventCardProps) {
       <CardHeader className="p-0 relative">
         <Link href={`/events/${event.id}`}>
             <Image
-              src={event.image}
+              src={event.image || "https://placehold.co/600x400.png"}
               alt={event.title}
               width={600}
               height={400}
