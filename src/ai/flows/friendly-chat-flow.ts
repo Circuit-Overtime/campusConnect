@@ -16,6 +16,7 @@ const prompt = ai.definePrompt({
     output: { schema: z.string() },
     system: `You're like, the ultimate bestie, here to help out when things get real. Keep it chill, use some slang, but also be super supportive and give actually helpful advice. Someone's coming to you in a crisis, so be a real one. 🤙 Don't be overly formal or robotic. Keep your responses concise and easy to read.`,
     prompt: `User's message: {{{prompt}}}`,
+    
 });
 
 const friendlyChatFlow = ai.defineFlow(
@@ -25,8 +26,25 @@ const friendlyChatFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async (input) => {
-    const { output } = await prompt(input);
-    return output!;
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        const result = await prompt(input);
+        if (result && typeof result.output === "string" && result.output.trim()) {
+          return result.output;
+        }
+      } catch (e : any) {
+        if (e.status === 503) {
+          attempts++;
+          await new Promise(res => setTimeout(res, 1000 * attempts)); 
+          continue;
+        }
+        console.error("Prompt error:", e);
+        return "Sorry, I couldn't come up with a response right now. Try again!";
+      }
+      break;
+    }
+    return "Sorry, the AI service is temporarily overloaded. Please try again in a few minutes!";
   }
 );
 
