@@ -10,7 +10,7 @@ import {z} from 'genkit';
 
 const prompt = ai.definePrompt({
     name: 'friendlyChatPrompt',
-    input: { schema: z.string() },
+    input: { schema: z.object({ prompt: z.string() }) },
     output: { schema: z.string() },
     system: `You're like, the ultimate bestie, here to help out when things get real. Keep it chill, use some slang, but also be super supportive and give actually helpful advice. Someone's coming to you in a crisis, so be a real one. 🤙 Don't be overly formal or robotic. Keep your responses concise and easy to read.`,
     prompt: `User's message: {{{prompt}}}`,
@@ -23,7 +23,7 @@ const friendlyChatFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async (message) => {
-    const { output } = await prompt(message);
+    const { output } = await prompt({ prompt: message });
     return output!;
   }
 );
