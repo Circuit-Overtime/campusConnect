@@ -1,10 +1,9 @@
 
 import { database } from "@/lib/firebase";
-import { ref, query, orderByChild, equalTo, get, onValue } from "firebase/database";
+import { ref, get } from "firebase/database";
 import type { User, BlogPost } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileQuestion } from "lucide-react";
 import { notFound } from "next/navigation";
 
 interface BlogPostWithId extends BlogPost {
@@ -24,17 +23,28 @@ async function getUserAndPosts(username: string): Promise<{ author: User, posts:
 
     try {
         const usersRef = ref(database, 'users');
-        const userQuery = query(usersRef, orderByChild('username'), equalTo(username));
-        const userSnapshot = await get(userQuery);
+        const usersSnapshot = await get(usersRef);
 
-        if (!userSnapshot.exists()) {
+        if (!usersSnapshot.exists()) {
             return null;
         }
 
-        const usersData = userSnapshot.val();
-        const userId = Object.keys(usersData)[0];
-        const userData = usersData[userId];
-        const author: User = { id: userId, ...userData };
+        const usersData = usersSnapshot.val();
+        let author: User | null = null;
+        let userId: string | null = null;
+
+        // Find the user with the matching username
+        for (const id in usersData) {
+            if (usersData[id].username?.toLowerCase() === username.toLowerCase()) {
+                userId = id;
+                author = { id, ...usersData[id] };
+                break;
+            }
+        }
+        
+        if (!author || !userId) {
+            return null; // User not found
+        }
 
         const postsRef = ref(database, `blogs/${userId}`);
         const postSnapshot = await get(postsRef);
