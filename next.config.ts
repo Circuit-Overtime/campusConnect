@@ -57,6 +57,12 @@ const nextConfig: NextConfig = {
         hostname: 'www.crn.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
