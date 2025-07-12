@@ -33,6 +33,30 @@ const nextConfig: NextConfig = {
         hostname: 'json.commudle.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'encrypted-tbn0.gstatic.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.freepik.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static.vecteezy.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.crn.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
