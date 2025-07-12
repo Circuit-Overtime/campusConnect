@@ -65,21 +65,19 @@ export default function BlogsListPage() {
             {authors.length > 0 ? (
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {authors.map((author) => (
-                        <Link key={author.id} href={`/blog/${author.username}`} legacyBehavior>
-                            <a className="block">
-                                <Card className="text-center items-center transition-all hover:shadow-lg hover:-translate-y-1 h-full">
-                                    <CardHeader className="items-center">
-                                        <Avatar className="h-20 w-20 border-2 border-primary">
-                                            <AvatarImage src={author.avatar} data-ai-hint="person face" />
-                                            <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <CardTitle className="text-lg">{author.name}</CardTitle>
-                                        <p className="text-sm text-muted-foreground">@{author.username}</p>
-                                    </CardContent>
-                                </Card>
-                            </a>
+                        <Link key={author.id} href={`/blog/${author.username}`} className="block">
+                            <Card className="text-center items-center transition-all hover:shadow-lg hover:-translate-y-1 h-full">
+                                <CardHeader className="items-center">
+                                    <Avatar className="h-20 w-20 border-2 border-primary">
+                                        <AvatarImage src={author.avatar} data-ai-hint="person face" />
+                                        <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                </CardHeader>
+                                <CardContent>
+                                    <CardTitle className="text-lg">{author.name}</CardTitle>
+                                    <p className="text-sm text-muted-foreground">@{author.username}</p>
+                                </CardContent>
+                            </Card>
                         </Link>
                     ))}
                 </div>
