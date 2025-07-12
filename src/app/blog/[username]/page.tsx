@@ -136,9 +136,7 @@ export default function UserBlogPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="prose dark:prose-invert max-w-none">
-                                    {post.content.split('\\n').map((paragraph, index) => (
-                                        <p key={index}>{paragraph}</p>
-                                    ))}
+                                    <p>{post.content}</p>
                                 </div>
                             </CardContent>
                         </Card>
