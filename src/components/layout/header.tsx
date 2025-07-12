@@ -83,7 +83,7 @@ export default function Header() {
         <div className="flex gap-6 md:gap-10">
           <Link href="/" className="flex items-center space-x-2 ml-10">
             <Briefcase className="h-6 w-6 text-primary" />
-            <span className="inline-block font-bold text-lg">CampusHub</span>
+            <span className="inline-block font-bold text-lg">Campus Connect</span>
           </Link>
           <nav className="hidden gap-6 md:flex">
             {navItems.map((item) => {
@@ -176,7 +176,7 @@ export default function Header() {
                 <nav className="grid gap-4 text-lg font-medium py-6">
                 <Link href="/" className="flex items-center space-x-2 mb-4">
                     <Briefcase className="h-6 w-6 text-primary" />
-                    <span className="inline-block font-bold text-lg">CampusHub</span>
+                    <span className="inline-block font-bold text-lg">Campus Connect</span>
                 </Link>
                   {navItems.map((item) => (
                     <NavLink key={item.href} item={item} isMobile/>

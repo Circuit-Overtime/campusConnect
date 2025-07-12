@@ -70,7 +70,7 @@ export default function CreateEventPage() {
                 image: image || "https://placehold.co/600x400.png",
                 tags: tags.split(',').map(tag => tag.trim()).filter(Boolean),
                 capacity: capacity || 0,
-                organizer: user.displayName || "CampusHub User",
+                organizer: user.displayName || "Campus Connect User",
                 organizerId: user.uid,
                 attendees: {
                     [user.uid]: true

@@ -9,10 +9,10 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center space-x-2">
             <Briefcase className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg">CampusHub</span>
+            <span className="font-bold text-lg">Campus Connect</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} CampusHub. All rights reserved.
+            © {new Date().getFullYear()} Campus Connect. All rights reserved.
           </p>
           <div className="flex items-center space-x-2">
             <Button variant="ghost" size="icon" asChild>

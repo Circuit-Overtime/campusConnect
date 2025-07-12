@@ -82,7 +82,7 @@ export default function Home() {
   return (
     <div className="space-y-12">
       <section className="text-center bg-card p-8 rounded-xl shadow-md">
-        <h1 className="text-4xl font-bold text-primary tracking-tight">Welcome to CampusHub</h1>
+        <h1 className="text-4xl font-bold text-primary tracking-tight">Welcome to Campus Connect</h1>
         <p className="mt-2 text-lg text-muted-foreground">Your central place for events, clubs, and campus life. Stay connected.</p>
       </section>
 

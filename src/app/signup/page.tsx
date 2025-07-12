@@ -62,7 +62,7 @@ export default function SignupPage() {
                 <CardHeader className="text-center">
                     <Briefcase className="mx-auto h-8 w-8 text-primary" />
                     <CardTitle className="text-2xl mt-2">Create an Account</CardTitle>
-                    <CardDescription>Enter your information to create an account on CampusHub</CardDescription>
+                    <CardDescription>Enter your information to create an account on Campus Connect</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSignup} className="grid gap-4">

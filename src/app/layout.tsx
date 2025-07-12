@@ -10,7 +10,7 @@ import { AuthProvider } from "@/components/providers/auth-provider";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "CampusHub - Your Campus Connection",
+  title: "Campus Connect - Your Campus Connection",
   description: "A modern, community-based campus collaboration platform.",
 };
 
