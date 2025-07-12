@@ -18,7 +18,7 @@ const clubs: Club[] = [
   { id: "2", name: "Art & Design Club", description: "Explore your creative side with us.", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFCwu1urCfLymGqAdtCxihNkTutFOeKUMQMA&s", category: "Arts" },
   { id: "3", name: "Debate Society", description: "Hone your public speaking and critical thinking.", logo: "https://img.freepik.com/free-vector/politicians-talking-having-debates-front-audience-flat-vector-illustration-cartoon-male-public-speakers-standing-rostrum-arguing_74855-8533.jpg?semt=ais_hybrid&w=740", category: "Academic" },
   { id: "4", name: "E-Sports Team", description: "Competitive gaming and community.", logo: "https://static.vecteezy.com/system/resources/previews/046/599/420/non_2x/esports-logo-simple-wolf-style-colourful-on-transparent-background-free-png.png", category: "Sports" },
-  { id: "5", name: "Photography Club", description: "Capture moments and learn new skills.", logo: "https://static.vecteezy.com/system/resources/previews/045/650/569/original/photography-logo-design-black-and-white-illustration-free-vector.jpg", category: "Arts" },
+  { id: "5", name: "Photography Club", description: "Capture moments and learn new skills.", logo: "https://i.pinimg.com/474x/c2/7f/6f/c27f6f036f594fad85a6e9b92d1130c6.jpg", category: "Arts" },
   { id: "6", name: "AI Innovators", description: "Working on the cutting edge of AI.", logo: "https://www.crn.com/news/components-peripherals/2025/media_18184e26634080b1df2521708d6a7eb7fb685ad7b.jpg?width=750&format=jpg&optimize=medium", category: "Tech" },
 ];
 
