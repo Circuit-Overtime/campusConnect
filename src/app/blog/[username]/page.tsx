@@ -1,116 +1,72 @@
-"use client";
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
 import { database } from "@/lib/firebase";
-import { ref, query, orderByChild, equalTo, get, onValue, type Unsubscribe } from "firebase/database";
+import { ref, query, orderByChild, equalTo, get, onValue } from "firebase/database";
 import type { User, BlogPost } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { FileQuestion } from "lucide-react";
+import { notFound } from "next/navigation";
 
 interface BlogPostWithId extends BlogPost {
     id: string;
 }
 
-export default function UserBlogPage() {
-    const params = useParams();
-    const username = params.username as string;
+interface UserBlogPageProps {
+    params: {
+        username: string;
+    }
+}
 
-    const [author, setAuthor] = useState<User | null>(null);
-    const [posts, setPosts] = useState<BlogPostWithId[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+async function getUserAndPosts(username: string): Promise<{ author: User, posts: BlogPostWithId[] } | null> {
+    if (!username) {
+        return null;
+    }
 
-    useEffect(() => {
-        if (!username) {
-            setError("No username provided in the URL.");
-            setLoading(false);
-            return;
+    try {
+        const usersRef = ref(database, 'users');
+        const userQuery = query(usersRef, orderByChild('username'), equalTo(username));
+        const userSnapshot = await get(userQuery);
+
+        if (!userSnapshot.exists()) {
+            return null;
         }
 
-        let unsubscribe: Unsubscribe | null = null;
+        const usersData = userSnapshot.val();
+        const userId = Object.keys(usersData)[0];
+        const userData = usersData[userId];
+        const author: User = { id: userId, ...userData };
 
-        const findUserAndPosts = async () => {
-            try {
-                const usersRef = ref(database, 'users');
-                const userQuery = query(usersRef, orderByChild('username'), equalTo(username));
-                const snapshot = await get(userQuery);
+        const postsRef = ref(database, `blogs/${userId}`);
+        const postSnapshot = await get(postsRef);
+        const postsData = postSnapshot.val();
 
-                if (snapshot.exists()) {
-                    const usersData = snapshot.val();
-                    const userId = Object.keys(usersData)[0];
-                    const userData = usersData[userId];
-                    const userProfile: User = { id: userId, ...userData };
-                    setAuthor(userProfile);
+        let posts: BlogPostWithId[] = [];
+        if (postsData) {
+            posts = Object.entries(postsData).map(([id, post]) => ({
+                id,
+                ...(post as BlogPost),
+            })).sort((a, b) => b.timestamp - a.timestamp);
+        }
 
-                    const postsRef = ref(database, `blogs/${userId}`);
-                    unsubscribe = onValue(postsRef, (postSnapshot) => {
-                        const postsData = postSnapshot.val();
-                        if (postsData) {
-                            const postsList = Object.entries(postsData).map(([id, post]) => ({
-                                id,
-                                ...(post as BlogPost),
-                            })).sort((a, b) => b.timestamp - a.timestamp);
-                            setPosts(postsList);
-                        } else {
-                            setPosts([]);
-                        }
-                        setLoading(false);
-                    }, (err) => {
-                        setError("Could not load blog posts. They may not be public.");
-                        setLoading(false);
-                    });
+        return { author, posts };
 
-                } else {
-                    setError("User not found.");
-                    setLoading(false);
-                }
-            } catch (err: any) {
-                setError("Failed to load blog. The user's profile or blog may not be public.");
-                setLoading(false);
-            }
-        };
-
-        findUserAndPosts();
-
-        return () => {
-            if (unsubscribe) {
-                unsubscribe();
-            }
-        };
-    }, [username]);
-
-    if (loading) {
-        return (
-            <div className="max-w-3xl mx-auto space-y-12">
-                <div className="flex items-center gap-4">
-                    <Skeleton className="h-24 w-24 rounded-full" />
-                    <div className="space-y-2">
-                        <Skeleton className="h-8 w-48" />
-                        <Skeleton className="h-4 w-64" />
-                    </div>
-                </div>
-                <div className="space-y-8">
-                    <Skeleton className="h-40 w-full" />
-                    <Skeleton className="h-40 w-full" />
-                    <Skeleton className="h-40 w-full" />
-                </div>
-            </div>
-        );
+    } catch (error) {
+        console.error("Failed to load blog data:", error);
+        return null;
     }
+}
+
+
+export default async function UserBlogPage({ params }: UserBlogPageProps) {
+    const { username } = params;
+    const data = await getUserAndPosts(username);
+
+    if (!data) {
+        return notFound();
+    }
+
+    const { author, posts } = data;
     
-    if (error || !author) {
-        return (
-            <div className="text-center py-20">
-                <FileQuestion className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h2 className="mt-4 text-2xl font-bold">Blog Not Found</h2>
-                <p className="mt-2 text-muted-foreground">{error || "The blog you are looking for does not exist."}</p>
-            </div>
-        )
-    }
-
     return (
         <div className="max-w-3xl mx-auto space-y-12">
             <header className="flex flex-col sm:flex-row items-center gap-6">
