@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { BlogPost, User } from "@/lib/types";
 import { Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface BlogPostWithId extends BlogPost {
     id: string;
@@ -87,7 +89,7 @@ export default function BlogManagementPage() {
     };
 
     const handleDelete = async (postId: string) => {
-        if (!user || !confirm("Are you sure you want to delete this post?")) return;
+        if (!user) return;
 
         try {
             await remove(ref(database, `blogs/${user.uid}/${postId}`));
@@ -160,9 +162,27 @@ export default function BlogManagementPage() {
                                         Published on {new Date(post.timestamp).toLocaleDateString()}
                                     </p>
                                 </div>
-                                <Button variant="destructive" size="icon" onClick={() => handleDelete(post.id)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="destructive" size="icon">
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This action cannot be undone. This will permanently delete your post.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDelete(post.id)}>
+                                                Delete
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                             </Card>
                         ))
                     ) : (
